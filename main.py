@@ -1,3 +1,21 @@
+from random import randint
+
+def Menu() -> None:
+    menu_tuple = (
+        "0. Arrêter de jouer",
+        "1. Jouer"
+    )
+    for menu_str in menu_tuple:
+        print(menu_str)
+    choix = input("Veuillez faire votre choix >> ")
+    boucle = True
+    while boucle:
+        if not int(choix) in [0, 1]:
+            print("Veuillez choisir entre ces deux options uniquement.")
+        else:
+            boucle = False
+    return choix
+
 def DemandeLettre() -> str:
     """
     Cette fonction demande une lettre à l'utilisateur.
@@ -57,40 +75,62 @@ def MajListe(l: str, L: list) -> list:
         return L
 
 
+def ChoisirMot():
+    """
+    Renvoie un mot en majuscules de la liste MotsPendus.txt
+    """
+    fichier= open('MotsPendus.txt','r')
+    num = randint(1, 1919)
+    i = 0
+    while i < num :
+        mot = fichier.readline()
+        i = i + 1
+    fichier.close()
+    mot_v = mot[:len(mot)-1]
+    return mot_v.upper()
+
+
 def main():
-    lettresProposees = []
-    nbErreursMax = 8
-    erreurs = 0
-    motCherche = "INFORMATIQUE"
-    motActuel = CreeMot(motCherche, lettresProposees)
-
-    print("Bienvenue dans le jeu du pendu !")
-
-    while erreurs < nbErreursMax and "-" in motActuel:
-        AfficheMot(motActuel)
-        AfficheListe(lettresProposees)
-        AfficheReste(erreurs, nbErreursMax)
-
-        lettre = DemandeLettre()
-
-        if lettre in lettresProposees:
-            print(
-                f"La lettre '{lettre}' a déjà été proposée, cela fait une erreur en plus. Essayez encore.")
-            erreurs += 1
+    boucle = True
+    while boucle:
+        choix = Menu()
+        if choix == "0":
+            print("Merci d'avoir jouer.")
+            boucle = False
         else:
-            lettresProposees = MajListe(lettre, lettresProposees)
-            if lettre in motCherche:
-                print(f"La lettre '{lettre}' est dans le mot ! Bien joué !")
-            else:
-                print(
-                    f"Dommage... La lettre '{lettre}' n'est pas dans le mot !")
-                erreurs += 1
+            lettresProposees = []
+            nbErreursMax = 8
+            erreurs = 0
+            motCherche = ChoisirMot()
             motActuel = CreeMot(motCherche, lettresProposees)
-    if "-" not in motActuel:
-        print(
-            f"Félicitations ! Vous avez gagnez avec {erreurs} erreur{'s' if not erreurs in [0, 1] else ''}.")
-    else:
-        print("Désolé, nous sommes arrivés à cours d'essais...")
+
+            print("Bienvenue dans le jeu du pendu !")
+
+            while erreurs < nbErreursMax and "-" in motActuel:
+                AfficheMot(motActuel)
+                AfficheListe(lettresProposees)
+                AfficheReste(erreurs, nbErreursMax)
+
+                lettre = DemandeLettre()
+
+                if lettre in lettresProposees:
+                    print(
+                        f"La lettre '{lettre}' a déjà été proposée, cela fait une erreur en plus. Essayez encore.")
+                    erreurs += 1
+                else:
+                    lettresProposees = MajListe(lettre, lettresProposees)
+                    if lettre in motCherche:
+                        print(f"La lettre '{lettre}' est dans le mot ! Bien joué !")
+                    else:
+                        print(
+                            f"Dommage... La lettre '{lettre}' n'est pas dans le mot !")
+                        erreurs += 1
+                    motActuel = CreeMot(motCherche, lettresProposees)
+            if "-" not in motActuel:
+                print(
+                    f"Félicitations ! Vous avez gagnez avec {erreurs} erreur{'s' if not erreurs in [0, 1] else ''}.")
+            else:
+                print(f"Désolé, nous sommes arrivés à cours d'essais... Le mot était {motCherche}")
 
 
 main()
